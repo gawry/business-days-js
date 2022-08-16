@@ -8,6 +8,7 @@ import {
 } from "./utils";
 
 const businessDays = ({
+  country = "US",
   state = "US",
   excludeHolidays = [],
   addHolidays = [],
@@ -15,17 +16,19 @@ const businessDays = ({
   /**
    * Factory function that creates a businessDays object.
    *
+   * @param {string} options.country – Country to determine holidays. Eg. "us". Defaults to "US"
    * @param {string} options.state – U.S. state to determine holidays. Eg. "pa". Defaults to "USA"
    * @param {Array} options.excludeHolidays – list of strings with holiday names to exclude from being considered as non-business days.
    * @returns {businessDays} businessDays object
    */
   const hd = new Holidays();
   validateState(state, hd);
-  const cleanUSState = state.toUpperCase();
-  if (cleanUSState === "US" || cleanUSState === "USA") {
-    hd.init("US");
+  const cleanState = state.toUpperCase();
+  const cleanCountry = country.toUpperCase();
+  if (cleanState === cleanCountry || cleanState === "USA") {
+    hd.init(cleanCountry);
   } else {
-    hd.init("US", cleanUSState);
+    hd.init(cleanCountry, cleanState);
   }
   if (excludeHolidays.length > 0) {
     filterHolidays(hd, excludeHolidays);
@@ -35,7 +38,7 @@ const businessDays = ({
   }
   return {
     hd,
-    USState: cleanUSState,
+    State: cleanState,
     getHolidays(year) {
       /**
        * Returns an array of all public holidays for a given year.
